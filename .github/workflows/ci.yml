@@ -29,21 +29,17 @@ jobs:
 
     - name: Isolate Model Artifact
       run: |
-        # 1. Cari folder model asli di dalam mlruns
-        ORIGINAL_MODEL=$(find . -type d -path "*/artifacts/model" | head -n 1)
-        echo "Ditemukan di: $ORIGINAL_MODEL"
+        ORIGINAL_MODEL=$(find mlruns -type d -name "model" | head -n 1)
+        echo "Ditemukan model di: $ORIGINAL_MODEL"
         
-        # 2. Copy utuh ke luar agar bebas dari isu permission & Docker context
-        cp -r $ORIGINAL_MODEL ./deploy_model
-        
-        # 3. Print isinya ke log GitHub untuk bukti bahwa file MLmodel ADA
-        echo "Isi folder deploy_model:"
+        # Copy folder tersebut
+        cp -r "$ORIGINAL_MODEL" ./deploy_model
+        echo "Isi folder siap deploy:"
         ls -la ./deploy_model
 
     - name: Build Docker Model
       run: |
-        # Build dari folder yang sudah diisolasi dan NAIKKAN TAG KE v2
-        mlflow models build-docker -m ./deploy_model -n "${{ secrets.DOCKER_USERNAME }}/churn-model:v2"
+        mlflow models build-docker -m ./deploy_model -n "${{ secrets.DOCKER_USERNAME }}/churn-model:v3"
 
     - name: Log in to Docker Hub
       run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin

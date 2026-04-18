@@ -6,9 +6,8 @@ from sklearn.ensemble import RandomForestClassifier
 
 with mlflow.start_run():
     print("Memuat data...")
-    # Path relatif ke luar folder MLProject
-    df = pd.read_csv('../Data_Cleaned.csv')
-    
+    #df = pd.read_csv('../Data_Cleaned.csv')
+    df = pd.read_csv('Data_Cleaned.csv')
     X = df.drop('Churn', axis=1)
     y = df['Churn']
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
