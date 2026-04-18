@@ -25,24 +25,27 @@ jobs:
 
     - name: Run MLflow Project
       run: |
+        # KUNCI RAHASIA: Paksa MLflow menyimpan log di folder utama GitHub, bukan di /tmp/
+        export MLFLOW_TRACKING_URI="file://$PWD/mlruns"
         mlflow run MLProject --env-manager=local
 
     - name: Isolate Model Artifact
       run: |
+        # Sekarang foldernya PASTI ada di sini dan tidak akan dihapus
         ORIGINAL_MODEL=$(find mlruns -type d -name "model" | head -n 1)
         echo "Ditemukan model di: $ORIGINAL_MODEL"
         
-        # Copy folder tersebut
         cp -r "$ORIGINAL_MODEL" ./deploy_model
         echo "Isi folder siap deploy:"
         ls -la ./deploy_model
 
     - name: Build Docker Model
       run: |
-        mlflow models build-docker -m ./deploy_model -n "${{ secrets.DOCKER_USERNAME }}/churn-model:v3"
+        # Naikkan ke versi 4 (v4) untuk sejarah perjuangan kita!
+        mlflow models build-docker -m ./deploy_model -n "${{ secrets.DOCKER_USERNAME }}/churn-model:v4"
 
     - name: Log in to Docker Hub
       run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
 
     - name: Push Docker Image
-      run: docker push ${{ secrets.DOCKER_USERNAME }}/churn-model:v2
+      run: docker push ${{ secrets.DOCKER_USERNAME }}/churn-model:v4
