@@ -25,15 +25,13 @@ jobs:
 
     - name: Run MLflow Project
       run: |
-        # Menggunakan env-manager local agar lebih cepat di GitHub Actions
         mlflow run MLProject --env-manager=local
 
     - name: Auto-Find Model Path
       run: |
-        # Mencari secara otomatis path menuju folder 'model' yang dihasilkan MLflow
-        MODEL_PATH=$(find mlruns -type d -path "*/artifacts/model" | head -n 1)
+        MODEL_PATH=$(find $PWD/mlruns -type d -path "*/artifacts/model" | head -n 1)
         echo "MODEL_PATH=$MODEL_PATH" >> $GITHUB_ENV
-        echo "Ditemukan path model di: $MODEL_PATH"
+        echo "Ditemukan path model absolut di: $MODEL_PATH"
 
     - name: Build Docker Model
       run: |
