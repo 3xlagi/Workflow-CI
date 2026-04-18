@@ -6,9 +6,6 @@ on:
       - main
       - master
 
-env:
-  MLFLOW_TRACKING_URI: "file://${{ github.workspace }}/mlruns"
-
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
@@ -28,32 +25,21 @@ jobs:
 
     - name: Run MLflow Project
       run: |
+        # Script python akan otomatis memuntahkan folder 'deploy_model' di sini
         mlflow run MLProject --env-manager=local
 
-    - name: Isolate Model Artifact (The /tmp Hunter)
+    - name: Verifikasi Hasil Penyelundupan
       run: |
-        echo "Menyisir folder /tmp untuk memburu model yang tertinggal..."
-        # Mencari di seluruh sistem Temp milik Ubuntu (menyembunyikan pesan error permission)
-        ORIGINAL_MODEL=$(find /tmp -type d -path "*/artifacts/model" 2>/dev/null | head -n 1)
-        
-        if [ -z "$ORIGINAL_MODEL" ]; then
-          echo "Model tidak ditemukan di /tmp! Kita kalah."
-          exit 1
-        fi
-        
-        echo "BINGO! Model berhasil diculik dari: $ORIGINAL_MODEL"
-        cp -r "$ORIGINAL_MODEL" ./deploy_model
-        
-        echo "=== ISI FOLDER SIAP DEPLOY ==="
+        echo "Mengecek apakah model berhasil diselundupkan..."
         ls -la ./deploy_model
 
     - name: Build Docker Model
       run: |
-        # Tag v6: Tanda berakhirnya drama
-        mlflow models build-docker -m ./deploy_model -n "${{ secrets.DOCKER_USERNAME }}/churn-model:v6"
+        # Tag v7: Lucky Number!
+        mlflow models build-docker -m ./deploy_model -n "${{ secrets.DOCKER_USERNAME }}/churn-model:v7"
 
     - name: Log in to Docker Hub
       run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
 
     - name: Push Docker Image
-      run: docker push ${{ secrets.DOCKER_USERNAME }}/churn-model:v6
+      run: docker push ${{ secrets.DOCKER_USERNAME }}/churn-model:v7
