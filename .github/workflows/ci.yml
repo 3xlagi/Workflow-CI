@@ -25,17 +25,22 @@ jobs:
 
     - name: Run MLflow Project
       run: |
-        # Script python akan otomatis memuntahkan folder 'deploy_model' di sini
+        # Script python akan otomatis memuntahkan folder 'deploy_model'
         mlflow run MLProject --env-manager=local
 
-    - name: Verifikasi Hasil Penyelundupan
+    - name: Verifikasi Hasil 
       run: |
-        echo "Mengecek apakah model berhasil diselundupkan..."
+        echo "Mengecek apakah model berhasil dimasukkan..."
         ls -la ./deploy_model
 
+    - name: Upload Model Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: model-artefak-ucup
+          path: mlruns/  
+          
     - name: Build Docker Model
       run: |
-        # Tag v7: Lucky Number!
         mlflow models build-docker -m ./deploy_model -n "${{ secrets.DOCKER_USERNAME }}/churn-model:v7"
 
     - name: Log in to Docker Hub
