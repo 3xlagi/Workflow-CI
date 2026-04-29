@@ -21,18 +21,17 @@ with mlflow.start_run():
     acc = rf.score(X_test, y_test)
     print(f"Akurasi: {acc}")
     
-    # 1. Simpan ke MLflow tracking (syarat Kriteria 3)
+    # Simpan ke MLflow tracking (syarat Kriteria)
     mlflow.log_metric("accuracy", acc)
     mlflow.sklearn.log_model(rf, "model")
     
-    # 2. JURUS TERLARANG: Selundupkan model langsung ke GitHub Workspace!
     workspace_path = os.getenv('GITHUB_WORKSPACE', '.')
     deploy_path = os.path.join(workspace_path, 'deploy_model')
     
-    # Bersihkan folder jika sebelumnya sudah ada
+
     if os.path.exists(deploy_path):
         shutil.rmtree(deploy_path)
         
-    # Tembak file MLmodel dan .pkl ke luar sebelum MLflow menghancurkan foldernya
+
     mlflow.sklearn.save_model(rf, deploy_path)
-    print(f"BINGO! Model berhasil diselundupkan secara paksa ke: {deploy_path}")
+    print(f"Berhasil {deploy_path}")
