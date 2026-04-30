@@ -21,7 +21,7 @@ with mlflow.start_run():
     acc = rf.score(X_test, y_test)
     print(f"Akurasi: {acc}")
     
-    # Simpan ke MLflow tracking (syarat Kriteria)
+    # Simpan ke MLflow tracking 
     mlflow.log_metric("accuracy", acc)
     mlflow.sklearn.log_model(rf, "model")
     
